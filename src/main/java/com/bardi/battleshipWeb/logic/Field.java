@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 public class Field {
 
+    public Field() {
+        this(new ArrayList<>(), new ArrayList<>());
+    }
+
     public Field(ArrayList<Ship> battleships, ArrayList<Point> missedPoints) {
         this.battleships = battleships;
         this.missedPoints = missedPoints;

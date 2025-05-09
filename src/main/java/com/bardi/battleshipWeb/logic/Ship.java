@@ -21,6 +21,8 @@ public class Ship {
         generatePoints(startPos, type, orientation);
     }
 
+    public Ship() {
+    }
     private void generatePoints(Point startPos, Type type, Orientation orientation) {
         int length = getShipLength(type);
 
