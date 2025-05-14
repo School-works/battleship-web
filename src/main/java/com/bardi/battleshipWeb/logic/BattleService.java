@@ -1,56 +1,50 @@
 package com.bardi.battleshipWeb.logic;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class BattleService {
 
-    private static Field playerField = new Field();
-    private static Field enemyField = new Field();
-    private static Orientation currentOrientation = Orientation.HORIZONTAL;
-    private static final int gridSize = 10;
+    private final Field playerField;
+    private final Field enemyField;
 
-    public static Field placeShip(Ship ship, Point startPoint, Type type) {
-        if (ship == null || startPoint == null || type == null) {
-            System.err.println("Errore piazzamento: dati navi invalidi");
-            return playerField;
+    public BattleService() {
+        this.playerField = new Field();
+        this.enemyField = new Field();
+    }
+
+    public boolean placePlayerShip(Ship ship) {
+        if (ship == null) {
+            System.err.println("Errore piazzamento: nave nulla");
+            return false;
         }
 
-        int shipLength = ship.getShipLength(type);  
-        List<Point> shipPoints = new ArrayList<>();
-
-        if (playerField.getShipCount(ship.getType()) >= type.getAmount()) {
-            System.err.println("Hai già piazzato tutte le navi di questo tipo");
-            return playerField;
+        try {
+            playerField.placeShip(ship);
+            return true;
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.err.println("Errore piazzamento: " + e.getMessage());
+            return false;
         }
+    }
 
-        for (int i = 0; i < shipLength; i++) {
-            int x = startPoint.getX();
-            int y = startPoint.getY();
-
-            if (ship.getOrientation() == Orientation.HORIZONTAL) {
-                x += i;
-            } else {
-                y += i;
-            }
-
-            if (x >= gridSize || y >= gridSize) {
-                System.err.println("Nave fuori dai limiti");
-                return playerField;
-            }
-
-            for (Ship placedShip : playerField.getBattleships()) {
-                if (placedShip.occupies(x, y)) {
-                    System.err.println("Spazio già occupato");
-                    return playerField;
+    public boolean fireAtEnemy(int x, int y) {
+        for (Ship ship : enemyField.getBattleships()) {
+            if (ship.occupies(x, y)) {
+                for (Point p : ship.getPoints()) {
+                    if (p.getX() == x && p.getY() == y) {
+                        p.setHit(true);
+                        return true;
+                    }
                 }
             }
-
-            shipPoints.add(new Point(x, y, false)); 
         }
+        enemyField.getMissedPoints().add(new Point(x, y, false));
+        return false;
+    }
 
-        // Now, actually add the ship to the field
-        playerField.addShip(shipPoints, type);  // Assuming Field class has addShip that takes shipPoints and Type
+    public Field getPlayerField() {
         return playerField;
+    }
+
+    public Field getEnemyField() {
+        return enemyField;
     }
 }

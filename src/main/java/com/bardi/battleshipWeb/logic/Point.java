@@ -7,4 +7,5 @@ import lombok.Data;
 public class Point {
     int x, y;
     boolean isHit;
+    
 }
