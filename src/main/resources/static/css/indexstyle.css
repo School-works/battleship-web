@@ -1,3 +1,29 @@
-.grid { display: grid; grid-template-columns: repeat(10, 30px); margin: 20px; }
-.cell { width: 30px; height: 30px; border: 1px solid #ccc; text-align: center; line-height: 30px; }
-.ship { background-color: lightblue; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  grid-template-rows: repeat(10, 30px);
+  gap: 2px;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  background-color: #cce5ff; /* colore acqua */
+  border: 1px solid #007bff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cell.ship {
+  background-color: #007bff; /* nave blu */
+}
+
+.cell.hit {
+  background-color: red !important;
+}
+
+.cell.miss {
+  background-color: lightgrey !important;
+}

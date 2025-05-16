@@ -1,41 +1,47 @@
 $(document).ready(function() {
     /*
-            DESTROYER(4, 1),//1 da 4 caselle
-        CRUISER(3,3), //3 da 3 caselle
-        SUBMARINE(2,3), //3 da 2 caselle
-        LANCE(2,3); //2 da 2 caselle
+        Tipi di navi con numero e dimensione:
+        DESTROYER(4, 1), // 1 nave da 4 caselle
+        CRUISER(3, 3),   // 3 navi da 3 caselle
+        SUBMARINE(2, 3), // 3 navi da 2 caselle
+        LANCE(2, 3);     // 3 navi da 2 caselle (?)
     */
-    var type = "DESTROYER";
 
-    // quando il documento (l'html) è pronto, esegui questo codice
-	function createEmptyGrid(container) {
-	    for (let i = 0; i < 100; i++) {
-	        $(container).append('<div class="cell" data-index="' + i + '"></div>');
-	    }
-	}
+    var type = "DESTROYER";
+    var orientation = "HORIZONTAL"
+
+    // Crea una griglia vuota con 100 celle
+    function createEmptyGrid(container) {
+        for (let i = 0; i < 100; i++) {
+            $(container).append('<div class="cell" data-index="' + i + '"></div>');
+        }
+    }
 
     createEmptyGrid('#player-grid');
     createEmptyGrid('#computer-grid');
 
+    // Click sulle celle della griglia del giocatore per posizionare la nave
     $('#player-grid').on('click', '.cell', function () {
-		const index = $(this).data('index');
-        console.log('hai cliccato sulla cella ', index);
+        const index = $(this).data('index');
+        console.log('Hai cliccato sulla cella ', index);
 
         $.ajax({
-            url: '/api/place-ship/' + index + "/" + type,
+            url: '/api/place-ship/' + index + "/" + type + "/" + orientation,
             method: 'POST',
             success: function(response) {
-                console.log('success', response);
+                console.log('Posizionamento riuscito', response);
+                // Qui potresti aggiornare la UI per mostrare la nave
+                // Per esempio, aggiungi una classe CSS per evidenziare la nave
+                $('#player-grid .cell').eq(index).addClass('ship');
             },
             error: function() {
-                alert('Errore nel caricamento delle griglie!');
+                alert('Errore nel piazzamento della nave!');
             }
-
         });
     });
 
     /*
-    // Chiamata AJAX per ottenere le posizioni casuali
+    // Se vuoi abilitare il popolamento casuale delle griglie, scommenta questo blocco
     $.ajax({
         url: '/api/popola-griglie',
         method: 'GET',
@@ -53,28 +59,26 @@ $(document).ready(function() {
         }
     });
     */
-	
-	// Aaggiungiamo il click sulle celle del campo del computer
-	$('#computer-grid').on('click', '.cell', function () {
-		const index = $(this).data('index');
 
-		$.ajax({
-			url: '/api/attacca/' + index,
-			method: 'PUT',
-			success: function (response) {
-				if (response.hit) {
-					alert('Colpito!');
-					// coloriamo di rosso
-					$('#computer-grid .cell').eq(index).css('background-color', 'red');
-				} else {
-					alert('Acqua!');
-					// coloriamo di grigio
-					$('#computer-grid .cell').eq(index).css('background-color', 'lightgrey');
-				}
-			},
-			error: function () {
-				alert('Errore nell\'attacco!');
-			}
-		});
-	});
+    // Click sulle celle della griglia del computer per attaccare
+    $('#computer-grid').on('click', '.cell', function () {
+        const index = $(this).data('index');
+
+        $.ajax({
+            url: '/api/attacca/' + index,
+            method: 'PUT',
+            success: function (response) {
+                if (response.hit) {
+                    alert('Colpito!');
+                    $('#computer-grid .cell').eq(index).css('background-color', 'red').addClass('hit');
+                } else {
+                    alert('Acqua!');
+                    $('#computer-grid .cell').eq(index).css('background-color', 'lightgrey').addClass('miss');
+                }
+            },
+            error: function () {
+                alert('Errore nell\'attacco!');
+            }
+        });
+    });
 });

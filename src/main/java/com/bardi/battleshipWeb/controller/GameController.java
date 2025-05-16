@@ -18,7 +18,7 @@ import com.bardi.battleshipWeb.logic.ShipState;
 import com.bardi.battleshipWeb.logic.Type;
 
 @RestController
-@RequestMapping("/api/game")
+@RequestMapping("/api")
 public class GameController {
 
     private final BattleService battleService;
@@ -39,6 +39,7 @@ public class GameController {
             Type type = Type.valueOf(typeString.toUpperCase());
             Orientation shipOrientation = Orientation.valueOf(orientation.toUpperCase());
             Point start = new Point(x, y, false);
+            System.out.println(type + "\n" + shipOrientation + "\n" + start);
             Ship ship = new Ship(start, type, shipOrientation, ShipState.MISS, true);
 
             boolean success = battleService.placePlayerShip(ship);

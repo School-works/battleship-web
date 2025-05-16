@@ -22,7 +22,6 @@ public class Ship {
     }
 
     public Ship() {
-        // Costruttore vuoto per Lombok o framework
     }
 
     private void generatePoints(Point startPos, Type type, Orientation orientation) {

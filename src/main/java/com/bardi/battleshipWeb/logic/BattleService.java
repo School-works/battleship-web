@@ -1,5 +1,8 @@
 package com.bardi.battleshipWeb.logic;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class BattleService {
 
     private final Field playerField;
