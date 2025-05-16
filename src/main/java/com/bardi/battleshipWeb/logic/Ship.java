@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class Ship {
+
     private List<Point> points = new ArrayList<>();
     private Type type;
     private Orientation orientation;
@@ -22,6 +23,10 @@ public class Ship {
     }
 
     public Ship() {
+    }
+
+    public List<Point> getPoints() {
+        return points;
     }
 
     private void generatePoints(Point startPos, Type type, Orientation orientation) {

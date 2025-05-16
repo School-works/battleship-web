@@ -13,6 +13,11 @@ public class Field {
     private int submarineCount = 0;
     private int lanceCount = 0;
 
+    private int destroyerLengthCount = 0;
+    private int cruiserLengthCount = 0;
+    private int submarineLengthCount = 0;
+    private int lanceLengthCount = 0;
+
     public Field() {
         this(new ArrayList<>(), new ArrayList<>());
     }
@@ -26,29 +31,97 @@ public class Field {
         return exists;
     }
 
-    public void addShip(Ship ship) {
-        if (isShipLimitExceeded(ship.getType())) {
-            throw new IllegalStateException("Hai finito le navi di tipo " + ship.getType());
+    public void placeShip(Ship ship) {
+        int x = ship.getStart().getX();
+        int y = ship.getStart().getY();
+        Type type = ship.getType();
+        Orientation orientation = ship.getOrientation();
+
+        if (!isValidPosition(x, y, type, orientation)) {
+            throw new IllegalArgumentException("Posizione della nave non valida");
         }
-        battleships.add(ship);
-        incrementShipCount(ship.getType());
+
+        if (isShipLenghtExceeded(type)) {
+            incrementShipCount(type);
+
+        } else {
+            incrementShipLengthCount(type);
+            battleships.add(ship);
+        }
+
+    }
+
+    private boolean isValidPosition(int x, int y, Type type, Orientation orientation) {
+        int length = type.getLength();
+
+        if ((orientation == Orientation.HORIZONTAL && x + length > 10)
+                || (orientation == Orientation.VERTICAL && y + length > 10)) {
+            return false;
+        }
+
+        for (int i = 0; i < length; i++) {
+            int checkX = (orientation == Orientation.HORIZONTAL) ? x + i : x;
+            int checkY = (orientation == Orientation.VERTICAL) ? y + i : y;
+
+            for (Ship ship : battleships) {
+                if (ship.occupies(checkX, checkY)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private boolean isShipLimitExceeded(Type type) {
         return switch (type) {
-            case DESTROYER -> destroyerCount >= type.getAmount();
-            case CRUISER -> cruiserCount >= type.getAmount();
-            case SUBMARINE -> submarineCount >= type.getAmount();
-            case LANCE -> lanceCount >= type.getAmount();
+            case DESTROYER ->
+                destroyerCount >= type.getAmount();
+            case CRUISER ->
+                cruiserCount >= type.getAmount();
+            case SUBMARINE ->
+                submarineCount >= type.getAmount();
+            case LANCE ->
+                lanceCount >= type.getAmount();
+        };
+    }
+
+    private Boolean isShipLenghtExceeded(Type type) {
+        return switch (type) {
+            case DESTROYER ->
+                destroyerLengthCount >= type.getLength();
+            case CRUISER ->
+                cruiserLengthCount >= type.getLength();
+            case SUBMARINE ->
+                submarineLengthCount >= type.getLength();
+            case LANCE ->
+                lanceLengthCount >= type.getLength();
         };
     }
 
     private void incrementShipCount(Type type) {
         switch (type) {
-            case DESTROYER -> destroyerCount++;
-            case CRUISER -> cruiserCount++;
-            case SUBMARINE -> submarineCount++;
-            case LANCE -> lanceCount++;
+            case DESTROYER ->
+                destroyerCount++;
+            case CRUISER ->
+                cruiserCount++;
+            case SUBMARINE ->
+                submarineCount++;
+            case LANCE ->
+                lanceCount++;
+        }
+    }
+
+    private void incrementShipLengthCount(Type type) {
+        switch (type) {
+            case DESTROYER ->
+                destroyerLengthCount++;
+            case CRUISER ->
+                cruiserLengthCount++;
+            case SUBMARINE ->
+                submarineLengthCount++;
+            case LANCE ->
+                lanceLengthCount++;
         }
     }
 
@@ -56,12 +129,14 @@ public class Field {
         boolean hit = false;
         for (Point p : enemyShip.getPoints()) {
             if (p.getX() == x && p.getY() == y) {
-                p.isHit = true;
+                p.setHit(true);
                 hit = true;
                 break;
             }
         }
-        if (!hit) missedPoints.add(new Point(x, y, false));
+        if (!hit) {
+            missedPoints.add(new Point(x, y, false));
+        }
     }
 
     public void checkCoordinates() {
@@ -69,12 +144,12 @@ public class Field {
             Ship ship1 = battleships.get(i);
             for (Point p : ship1.getPoints()) {
                 if (p.getX() < 0 || p.getX() >= 10 || p.getY() < 0 || p.getY() >= 10) {
-                    throw new IllegalStateException("La nave " + i + " è out of bounds");
+                    throw new IllegalStateException("La nave " + i + " è fuori dai limiti");
                 }
             }
             for (int j = i + 1; j < battleships.size(); j++) {
                 if (shipsOverlap(ship1, battleships.get(j))) {
-                    throw new IllegalStateException("La barca " + i + " si sovrappone con la barca " + j);
+                    throw new IllegalStateException("La nave " + i + " si sovrappone con la nave " + j);
                 }
             }
         }
@@ -91,44 +166,11 @@ public class Field {
         return false;
     }
 
-    public void placeShip(Ship ship) {
-        if (isValidPosition(ship.getStart().getX(), ship.getStart().getY(), ship.getType(), ship.getOrientation())) {
-            battleships.add(ship);
-            incrementShipCount(ship.getType());
-        } else {
-            throw new IllegalArgumentException("Posizione della Barca non valida");
-        }
-    }
-
-    private boolean isValidPosition(int x, int y, Type type, Orientation orientation) {
-        int shipLength = type.getLength();
-
-        if ((orientation == Orientation.HORIZONTAL && x + shipLength > 10) ||
-            (orientation == Orientation.VERTICAL && y + shipLength > 10)) {
-            return false;
-        }
-
-        for (int i = 0; i < shipLength; i++) {
-            int checkX = (orientation == Orientation.HORIZONTAL) ? x + i : x;
-            int checkY = (orientation == Orientation.VERTICAL) ? y + i : y;
-            for (Ship ship : battleships) {
-                if (ship.occupies(checkX, checkY)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public ArrayList<Ship> getBattleships() {
         return battleships;
     }
 
     public ArrayList<Point> getMissedPoints() {
         return missedPoints;
-    }
-
-    public int getShipCount(Type type) {
-        return (int) battleships.stream().filter(s -> s.getType() == type).count();
     }
 }

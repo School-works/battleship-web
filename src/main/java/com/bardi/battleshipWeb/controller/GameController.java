@@ -30,8 +30,8 @@ public class GameController {
 
     @PostMapping("/place-ship/{index}/{typeString}/{orientation}")
     public ResponseEntity<Field> placeShip(@PathVariable int index,
-                                           @PathVariable String typeString,
-                                           @PathVariable String orientation) {
+            @PathVariable String typeString,
+            @PathVariable String orientation) {
         int x = index / 10;
         int y = index % 10;
 
@@ -39,13 +39,15 @@ public class GameController {
             Type type = Type.valueOf(typeString.toUpperCase());
             Orientation shipOrientation = Orientation.valueOf(orientation.toUpperCase());
             Point start = new Point(x, y, false);
-            System.out.println(type + "\n" + shipOrientation + "\n" + start);
+            System.out.println("tipo " + type + "\norientamento" + shipOrientation + "\ninizio nave" + start + "\nquantita per tipo" + type.getAmount() + "\nlunghezza " + type.getLength());
             Ship ship = new Ship(start, type, shipOrientation, ShipState.MISS, true);
 
             boolean success = battleService.placePlayerShip(ship);
-            return success ?
-                    ResponseEntity.ok(battleService.getPlayerField()) :
-                    ResponseEntity.badRequest().body(battleService.getPlayerField());
+            if (success) {
+                return ResponseEntity.ok(battleService.getPlayerField());
+            } else {
+                return ResponseEntity.badRequest().body(battleService.getPlayerField());
+            }
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();

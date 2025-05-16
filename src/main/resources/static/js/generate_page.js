@@ -8,7 +8,7 @@ $(document).ready(function() {
     */
 
     var type = "DESTROYER";
-    var orientation = "HORIZONTAL"
+    var orientation = "HORIZONTAL";
 
     // Crea una griglia vuota con 100 celle
     function createEmptyGrid(container) {
