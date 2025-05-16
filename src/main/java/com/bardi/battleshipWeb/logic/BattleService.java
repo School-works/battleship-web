@@ -12,19 +12,20 @@ public class BattleService {
 
     public boolean placePlayerShip(Ship ship) {
         if (ship == null) {
-            System.err.println("Errore piazzamento: nave nulla");
+            System.err.println("Errore piazzamento: la nave è nulla.");
             return false;
         }
 
         try {
-            playerField.placeShip(ship);
+            playerField.placeShip(ship); 
             return true;
         } catch (IllegalArgumentException | IllegalStateException e) {
-            System.err.println("Errore piazzamento: " + e.getMessage());
+            System.err.println("Errore durante il piazzamento della nave: " + e.getMessage());
             return false;
         }
     }
 
+  
     public boolean fireAtEnemy(int x, int y) {
         for (Ship ship : enemyField.getBattleships()) {
             if (ship.occupies(x, y)) {
@@ -36,6 +37,8 @@ public class BattleService {
                 }
             }
         }
+
+        // Colpi mancati
         enemyField.getMissedPoints().add(new Point(x, y, false));
         return false;
     }

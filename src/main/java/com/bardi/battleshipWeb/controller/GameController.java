@@ -1,6 +1,5 @@
 package com.bardi.battleshipWeb.controller;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import org.springframework.http.ResponseEntity;
@@ -19,28 +18,20 @@ import com.bardi.battleshipWeb.logic.ShipState;
 import com.bardi.battleshipWeb.logic.Type;
 
 @RestController
-@RequestMapping("/api")
-public class GameController {
-    
-    private Field field = new Field(new ArrayList<>(), new ArrayList<>());
-    private Random random = new Random();
-
-@RestController
-@RequestMapping("/game")
+@RequestMapping("/api/game")
 public class GameController {
 
     private final BattleService battleService;
+    private final Random random = new Random();
 
     public GameController(BattleService battleService) {
         this.battleService = battleService;
     }
 
     @PostMapping("/place-ship/{index}/{typeString}/{orientation}")
-    public ResponseEntity<Field> placeShip(
-        @PathVariable int index,
-        @PathVariable String typeString,
-        @PathVariable String orientation
-    ) {
+    public ResponseEntity<Field> placeShip(@PathVariable int index,
+                                           @PathVariable String typeString,
+                                           @PathVariable String orientation) {
         int x = index / 10;
         int y = index % 10;
 
@@ -48,34 +39,26 @@ public class GameController {
             Type type = Type.valueOf(typeString.toUpperCase());
             Orientation shipOrientation = Orientation.valueOf(orientation.toUpperCase());
             Point start = new Point(x, y, false);
-            Ship ship = new Ship(start, type, shipOrientation, ShipState.ALIVE, true);
+            Ship ship = new Ship(start, type, shipOrientation, ShipState.MISS, true);
 
             boolean success = battleService.placePlayerShip(ship);
-            if (success) {
-                return ResponseEntity.ok(battleService.getPlayerField());
-            } else {
-                return ResponseEntity.badRequest().body(battleService.getPlayerField());
-            }
+            return success ?
+                    ResponseEntity.ok(battleService.getPlayerField()) :
+                    ResponseEntity.badRequest().body(battleService.getPlayerField());
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
-}
-
 
     @GetMapping("/generate")
     public String generateShips() {
-      
         try {
             generateShipPlacement(Type.DESTROYER);
             generateShipPlacement(Type.CRUISER);
             generateShipPlacement(Type.SUBMARINE);
             generateShipPlacement(Type.LANCE);
-            
-            
-            field.checkCoordinates();
-            
+            battleService.getPlayerField().checkCoordinates();
             return "Navi generate";
         } catch (IllegalStateException e) {
             return e.getMessage();
@@ -86,24 +69,17 @@ public class GameController {
         int shipsPlaced = 0;
 
         while (shipsPlaced < type.getAmount()) {
-            Orientation orientation;
-            Boolean randomBoolean = random.nextBoolean();
-            if (randomBoolean) {
-                orientation = Orientation.HORIZONTAL;
-            } else {
-                orientation = Orientation.VERTICAL;
-            }
-
+            Orientation orientation = random.nextBoolean() ? Orientation.HORIZONTAL : Orientation.VERTICAL;
             int x = random.nextInt(10);
             int y = random.nextInt(10);
+            Point start = new Point(x, y, false);
+            Ship ship = new Ship(start, type, orientation, ShipState.MISS, true);
 
             try {
-                field.placeShip(null);;
+                battleService.placePlayerShip(ship);
                 shipsPlaced++;
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignored) {
             }
         }
     }
-   // @GetMapping("/Attack/{index}")
-    
 }

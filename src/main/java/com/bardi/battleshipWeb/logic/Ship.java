@@ -22,41 +22,35 @@ public class Ship {
     }
 
     public Ship() {
+        // Costruttore vuoto per Lombok o framework
     }
+
     private void generatePoints(Point startPos, Type type, Orientation orientation) {
-        int length = getShipLength(type);
+        int length = type.getLength();
 
         for (int i = 0; i < length; i++) {
-            int x = startPos.x;
-            int y = startPos.y;
+            int x = startPos.getX();
+            int y = startPos.getY();
 
             if (orientation == Orientation.HORIZONTAL) {
-                x = startPos.x + i;
+                x += i;
             } else if (orientation == Orientation.VERTICAL) {
-                y = startPos.y + i;
+                y += i;
             }
 
-            points.add(new Point(x, y, false)); // falso perchè all'inizio non è colpito
+            points.add(new Point(x, y, false)); // false: non colpito all'inizio
         }
     }
 
-    
-    public List<Point> getPoints() {
-        return points;
-    }
     public boolean isSunk() {
         for (Point p : points) {
-            if (p.isHit()) {
+            if (!p.isHit()) {
                 return false;
             }
         }
         return true;
     }
 
-    int getShipLength(Type type) {
-        return type.getLength();
-    }
-    
     public boolean occupies(int x, int y) {
         for (Point p : points) {
             if (p.getX() == x && p.getY() == y) {
@@ -66,4 +60,7 @@ public class Ship {
         return false;
     }
 
+    public Point getStart() {
+        return points.isEmpty() ? null : points.get(0);
+    }
 }
