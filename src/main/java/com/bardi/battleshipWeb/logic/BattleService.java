@@ -28,24 +28,6 @@ public class BattleService {
         }
     }
 
-  
-    public boolean fireAtEnemy(int x, int y) {
-        for (Ship ship : enemyField.getBattleships()) {
-            if (ship.occupies(x, y)) {
-                for (Point p : ship.getPoints()) {
-                    if (p.getX() == x && p.getY() == y) {
-                        p.setHit(true);
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // Colpi mancati
-        enemyField.getMissedPoints().add(new Point(x, y, false));
-        return false;
-    }
-
     public Field getPlayerField() {
         return playerField;
     }

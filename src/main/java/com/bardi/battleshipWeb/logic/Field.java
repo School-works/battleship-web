@@ -13,11 +13,6 @@ public class Field {
     private int submarineCount = 0;
     private int lanceCount = 0;
 
-    private int destroyerLengthCount = 0;
-    private int cruiserLengthCount = 0;
-    private int submarineLengthCount = 0;
-    private int lanceLengthCount = 0;
-
     public Field() {
         this(new ArrayList<>(), new ArrayList<>());
     }
@@ -37,17 +32,23 @@ public class Field {
         Type type = ship.getType();
         Orientation orientation = ship.getOrientation();
 
-        if (!isValidPosition(x, y, type, orientation)) {
+        for (int i = 0 ; i < ship.getType().getLength() ; i++) {
+            System.out.println(i);
+            if (isShipLimitExceeded(type)) {
+                throw new IllegalArgumentException("Troppe navi per tipo");
+            }
+            if (ship.getOrientation() == orientation.HORIZONTAL) {
+                Point point = new Point(x+i, y, false);
+                ship.addPoint(point);
+            }else if (ship.getOrientation() == orientation.VERTICAL) {
+                Point point = new Point(x, y+i, false);
+                ship.addPoint(point);
+            }
+        }
+        if (!isValidPosition(x, y, type, orientation) && shipsOverlap(ship, ship)) {
             throw new IllegalArgumentException("Posizione della nave non valida");
         }
-
-        if (isShipLenghtExceeded(type)) {
-            incrementShipCount(type);
-
-        } else {
-            incrementShipLengthCount(type);
-            battleships.add(ship);
-        }
+        
 
     }
 
@@ -86,19 +87,6 @@ public class Field {
         };
     }
 
-    private Boolean isShipLenghtExceeded(Type type) {
-        return switch (type) {
-            case DESTROYER ->
-                destroyerLengthCount >= type.getLength();
-            case CRUISER ->
-                cruiserLengthCount >= type.getLength();
-            case SUBMARINE ->
-                submarineLengthCount >= type.getLength();
-            case LANCE ->
-                lanceLengthCount >= type.getLength();
-        };
-    }
-
     private void incrementShipCount(Type type) {
         switch (type) {
             case DESTROYER ->
@@ -109,19 +97,6 @@ public class Field {
                 submarineCount++;
             case LANCE ->
                 lanceCount++;
-        }
-    }
-
-    private void incrementShipLengthCount(Type type) {
-        switch (type) {
-            case DESTROYER ->
-                destroyerLengthCount++;
-            case CRUISER ->
-                cruiserLengthCount++;
-            case SUBMARINE ->
-                submarineLengthCount++;
-            case LANCE ->
-                lanceLengthCount++;
         }
     }
 

@@ -1,60 +1,42 @@
 package com.bardi.battleshipWeb.logic;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import lombok.Data;
-
-@Data
 public class Ship {
-
-    private List<Point> points = new ArrayList<>();
+    private Point start;
     private Type type;
     private Orientation orientation;
-    private ShipState shipState;
-    private boolean isPlaced;
+    private ArrayList<Point> points;
 
-    public Ship(Point startPos, Type type, Orientation orientation, ShipState shipState, boolean isPlaced) {
+    public Ship(Point start, Type type, Orientation orientation) {
+        this.start = start;
         this.type = type;
         this.orientation = orientation;
-        this.shipState = shipState;
-        this.isPlaced = isPlaced;
-        generatePoints(startPos, type, orientation);
+        this.points = new ArrayList<>();
     }
 
-    public Ship() {
+    public Point getStart() {
+        return start;
     }
 
-    public List<Point> getPoints() {
+    public Type getType() {
+        return type;
+    }
+
+    public Orientation getOrientation() {
+        return orientation;
+    }
+
+    public ArrayList<Point> getPoints() {
         return points;
     }
 
-    private void generatePoints(Point startPos, Type type, Orientation orientation) {
-        int length = type.getLength();
-
-        for (int i = 0; i < length; i++) {
-            int x = startPos.getX();
-            int y = startPos.getY();
-
-            if (orientation == Orientation.HORIZONTAL) {
-                x += i;
-            } else if (orientation == Orientation.VERTICAL) {
-                y += i;
-            }
-
-            points.add(new Point(x, y, false)); // false: non colpito all'inizio
-        }
+    public void setPoints(ArrayList<Point> points) {
+        this.points = points;
     }
-
-    public boolean isSunk() {
-        for (Point p : points) {
-            if (!p.isHit()) {
-                return false;
-            }
-        }
-        return true;
+    public void addPoint(Point point) {
+        points.add(point);
     }
-
     public boolean occupies(int x, int y) {
         for (Point p : points) {
             if (p.getX() == x && p.getY() == y) {
@@ -62,9 +44,5 @@ public class Ship {
             }
         }
         return false;
-    }
-
-    public Point getStart() {
-        return points.isEmpty() ? null : points.get(0);
     }
 }

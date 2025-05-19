@@ -40,7 +40,7 @@ public class GameController {
             Orientation shipOrientation = Orientation.valueOf(orientation.toUpperCase());
             Point start = new Point(x, y, false);
             System.out.println("tipo " + type + "\norientamento" + shipOrientation + "\ninizio nave" + start + "\nquantita per tipo" + type.getAmount() + "\nlunghezza " + type.getLength());
-            Ship ship = new Ship(start, type, shipOrientation, ShipState.MISS, true);
+            Ship ship = new Ship(start, type, shipOrientation);
 
             boolean success = battleService.placePlayerShip(ship);
             if (success) {
@@ -76,7 +76,7 @@ public class GameController {
             int x = random.nextInt(10);
             int y = random.nextInt(10);
             Point start = new Point(x, y, false);
-            Ship ship = new Ship(start, type, orientation, ShipState.MISS, true);
+            Ship ship = new Ship(start, type, orientation);
 
             try {
                 battleService.placePlayerShip(ship);
