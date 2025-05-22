@@ -3,9 +3,9 @@ package com.bardi.battleshipWeb.controller;
 import java.util.Random;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,44 +51,9 @@ public class GameController {
         }
     }
 
-    @GetMapping("/generate")
-    public String generateShips() {
-        try {
-            generateShipPlacement(Type.DESTROYER);
-            generateShipPlacement(Type.CRUISER);
-            generateShipPlacement(Type.SUBMARINE);
-            generateShipPlacement(Type.LANCE);
-            battleService.getPlayerField().checkCoordinates();
-            return "Navi generate";
-        } catch (IllegalStateException e) {
-            return e.getMessage();
-        }
-    }
-
-    private void generateShipPlacement(Type type) {
-        int shipsPlaced = 0;
-
-        while (shipsPlaced < type.getAmount()) {
-            Orientation orientation = random.nextBoolean() ? Orientation.HORIZONTAL : Orientation.VERTICAL;
-            int x = random.nextInt(10);
-            int y = random.nextInt(10);
-            Point start = new Point(x, y, false);
-            Ship ship = new Ship(start, type, orientation);
-
-            try {
-                battleService.placePlayerShip(ship);
-                shipsPlaced++;
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
+    @PutMapping("/attacca/{index}")
+    public ResponseEntity<?> attacca(@PathVariable int index) {
+        boolean hit = battleService.attackEnemy(index);
+        return ResponseEntity.ok().body(java.util.Map.of("hit", hit));
     }
 }
-    /* @GetMapping("/player-field")
-     public Field getPlayerField() {
-         return battleService.getPlayerField();
-     }*/
-
-   /* @PutMapping("/attacca/{index}")
-     public ResponseEntity<?> attacca(@PathVariable int index) {
-        
-    }*/

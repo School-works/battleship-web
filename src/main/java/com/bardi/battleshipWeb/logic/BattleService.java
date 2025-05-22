@@ -1,5 +1,7 @@
 package com.bardi.battleshipWeb.logic;
 
+import java.util.Random;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,6 +13,7 @@ public class BattleService {
     public BattleService() {
         this.playerField = new Field();
         this.enemyField = new Field();
+        generateEnemyField(); // genera automaticamenta il campo nemico
     }
 
     public boolean placePlayerShip(Ship ship) {
@@ -52,5 +55,26 @@ public class BattleService {
             enemyField.getMissedPoints().add(new Point(x, y, false));
         }
         return hit;
+    }
+
+    public void generateEnemyField() {
+        Random random = new Random();
+
+        for (Type type : Type.values()) {
+            int shipsPlaced = 0;
+            while (shipsPlaced < type.getAmount()) {
+                Orientation orientation = random.nextBoolean() ? Orientation.HORIZONTAL : Orientation.VERTICAL;
+                int x = random.nextInt(10);
+                int y = random.nextInt(10);
+                Point start = new Point(x, y, false);
+                Ship ship = new Ship(start, type, orientation);
+                try {
+                    enemyField.placeShip(ship);
+                    shipsPlaced++;
+                } catch (IllegalArgumentException ignored) {
+                    // riprova se il piazzamento non è valido
+                }
+            }
+        }
     }
 }
