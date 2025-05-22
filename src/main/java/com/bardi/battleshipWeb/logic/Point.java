@@ -11,13 +11,8 @@ public class Point {
         this.hit = hit;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
+    public int getX() { return x; }
+    public int getY() { return y; }
 
     public boolean isHit() {
         return hit;

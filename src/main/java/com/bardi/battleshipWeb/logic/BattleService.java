@@ -35,5 +35,22 @@ public class BattleService {
     public Field getEnemyField() {
         return enemyField;
     }
+
+    public boolean attackEnemy(int index) {
+        int x = index / 10;
+        int y = index % 10;
+        boolean hit = false;
+        for (Ship ship : enemyField.getBattleships()) {
+            if (ship.occupies(x, y)) {
+                enemyField.hit(x, y, ship); // questo marca il punto come colpito o lo registra come mancato
+                hit = true;
+                break;
+            }
+        }
+        if (!hit) {
+            // se nessuna barca occupa il punto, registra un colpo mancato
+            enemyField.getMissedPoints().add(new Point(x, y, false));
+        }
+        return hit;
+    }
 }
-    

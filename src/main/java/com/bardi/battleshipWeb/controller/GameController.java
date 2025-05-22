@@ -14,7 +14,6 @@ import com.bardi.battleshipWeb.logic.Field;
 import com.bardi.battleshipWeb.logic.Orientation;
 import com.bardi.battleshipWeb.logic.Point;
 import com.bardi.battleshipWeb.logic.Ship;
-import com.bardi.battleshipWeb.logic.ShipState;
 import com.bardi.battleshipWeb.logic.Type;
 
 @RestController
@@ -39,7 +38,6 @@ public class GameController {
             Type type = Type.valueOf(typeString.toUpperCase());
             Orientation shipOrientation = Orientation.valueOf(orientation.toUpperCase());
             Point start = new Point(x, y, false);
-            System.out.println("tipo " + type + "\norientamento" + shipOrientation + "\ninizio nave" + start + "\nquantita per tipo" + type.getAmount() + "\nlunghezza " + type.getLength());
             Ship ship = new Ship(start, type, shipOrientation);
 
             boolean success = battleService.placePlayerShip(ship);
@@ -48,7 +46,6 @@ public class GameController {
             } else {
                 return ResponseEntity.badRequest().body(battleService.getPlayerField());
             }
-
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -86,3 +83,12 @@ public class GameController {
         }
     }
 }
+    /* @GetMapping("/player-field")
+     public Field getPlayerField() {
+         return battleService.getPlayerField();
+     }*/
+
+   /* @PutMapping("/attacca/{index}")
+     public ResponseEntity<?> attacca(@PathVariable int index) {
+        
+    }*/

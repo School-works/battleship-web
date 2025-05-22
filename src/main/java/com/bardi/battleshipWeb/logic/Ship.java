@@ -1,6 +1,7 @@
 package com.bardi.battleshipWeb.logic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Ship {
     private Point start;
@@ -27,7 +28,7 @@ public class Ship {
         return orientation;
     }
 
-    public ArrayList<Point> getPoints() {
+    public List<Point> getPoints() {
         return points;
     }
 

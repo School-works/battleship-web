@@ -1,6 +1,7 @@
 package com.bardi.battleshipWeb.logic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Field {
 
@@ -33,14 +34,13 @@ public class Field {
         Orientation orientation = ship.getOrientation();
 
         for (int i = 0 ; i < ship.getType().getLength() ; i++) {
-            System.out.println(i);
             if (isShipLimitExceeded(type)) {
                 throw new IllegalArgumentException("Troppe navi per tipo");
             }
-            if (ship.getOrientation() == orientation.HORIZONTAL) {
+            if (ship.getOrientation() == Orientation.HORIZONTAL) {
                 Point point = new Point(x+i, y, false);
                 ship.addPoint(point);
-            }else if (ship.getOrientation() == orientation.VERTICAL) {
+            } else if (ship.getOrientation() == Orientation.VERTICAL) {
                 Point point = new Point(x, y+i, false);
                 ship.addPoint(point);
             }
@@ -48,8 +48,9 @@ public class Field {
         if (!isValidPosition(x, y, type, orientation) && shipsOverlap(ship, ship)) {
             throw new IllegalArgumentException("Posizione della nave non valida");
         }
-        
 
+        battleships.add(ship);
+        incrementShipCount(type);
     }
 
     private boolean isValidPosition(int x, int y, Type type, Orientation orientation) {
@@ -141,7 +142,7 @@ public class Field {
         return false;
     }
 
-    public ArrayList<Ship> getBattleships() {
+    public List<Ship> getBattleships() {
         return battleships;
     }
 
@@ -149,3 +150,4 @@ public class Field {
         return missedPoints;
     }
 }
+

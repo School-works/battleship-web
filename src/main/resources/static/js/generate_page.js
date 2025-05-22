@@ -20,64 +20,58 @@ $(document).ready(function() {
     createEmptyGrid('#player-grid');
     createEmptyGrid('#computer-grid');
 
-    // Click sulle celle della griglia del giocatore per posizionare la nave
+    // click sulle celle della griglia del giocatore per posizionare la nave
     $('#player-grid').on('click', '.cell', function () {
         const index = $(this).data('index');
-        console.log('Hai cliccato sulla cella ', index);
-
+        console.log(`[SHIP] Clicked cell index: ${index}, type: ${type}, orientation: ${orientation}`);
         $.ajax({
             url: '/api/place-ship/' + index + "/" + type + "/" + orientation,
             method: 'POST',
             success: function(response) {
-                console.log('Posizionamento riuscito', response);
-                // Qui potresti aggiornare la UI per mostrare la nave
-                // Per esempio, aggiungi una classe CSS per evidenziare la nave
-                $('#player-grid .cell').eq(index).addClass('ship');
+                console.log('[SHIP] risposta:', response);
+                if (response && response.battleships) {
+                    $('#player-grid .cell').removeClass('ship');
+                    response.battleships.forEach(function(ship, shipIdx) {
+                        console.log(`[SHIP] nave #${shipIdx} tipo: ${ship.type}, punti:`, ship.points);
+                        if (ship.points) {
+                            ship.points.forEach(function(point) {
+                                const idx = point.x * 10 + point.y;
+                                console.log(`[SHIP] cambio colore alla nave nella cella: ${idx} (x=${point.x}, y=${point.y})`);
+                                $('#player-grid .cell').eq(idx).addClass('ship');
+                            });
+                        }
+                    });
+                } else {
+                    console.log('[SHIP] nessuna nave piazzata o risposta non valida');
+                }
             },
-            error: function() {
-                alert('Errore nel piazzamento della nave!');
+            error: function(xhr) {
+                console.log('[SHIP] errore piazzando la nave:', xhr);
+                alert('errore nel piazzamento della nave!');
             }
         });
     });
 
-    /*
-    // Se vuoi abilitare il popolamento casuale delle griglie, scommenta questo blocco
-    $.ajax({
-        url: '/api/popola-griglie',
-        method: 'GET',
-        success: function(response) {
-            // response = { player: [1, 23, 45], computer: [10, 20, 30] }
-            response.player.forEach(index => {
-                $('#player-grid .cell').eq(index).addClass('ship');
-            });
-            response.computer.forEach(index => {
-                $('#computer-grid .cell').eq(index).addClass('ship');
-            });
-        },
-        error: function() {
-            alert('Errore nel caricamento delle griglie!');
-        }
-    });
-    */
-
-    // Click sulle celle della griglia del computer per attaccare
+    // click sulle celle della griglia del computer per attaccare
     $('#computer-grid').on('click', '.cell', function () {
         const index = $(this).data('index');
-
+        console.log(`[ATTACK] cliccato alla cella con index: ${index}`);
         $.ajax({
             url: '/api/attacca/' + index,
             method: 'PUT',
             success: function (response) {
+                console.log('[ATTACK] risposta:', response);
                 if (response.hit) {
-                    alert('Colpito!');
+                    alert('colpito!');
                     $('#computer-grid .cell').eq(index).css('background-color', 'red').addClass('hit');
                 } else {
                     alert('Acqua!');
                     $('#computer-grid .cell').eq(index).css('background-color', 'lightgrey').addClass('miss');
                 }
             },
-            error: function () {
-                alert('Errore nell\'attacco!');
+            error: function (xhr) {
+                console.log('[ATTACK] erorre attaccando:', xhr);
+                alert('errore nell\'attacco!');
             }
         });
     });
