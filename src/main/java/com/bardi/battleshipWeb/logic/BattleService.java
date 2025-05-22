@@ -120,4 +120,12 @@ public class BattleService {
         }
         return index; // restituisce la cella attaccata dal nemico
     }
+
+    public boolean isPlayerWinner() {
+        return enemyField.allShipsSunk();
+    }
+
+    public boolean isEnemyWinner() {
+        return playerField.allShipsSunk();
+    }
 }

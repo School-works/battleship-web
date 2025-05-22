@@ -149,5 +149,19 @@ public class Field {
     public ArrayList<Point> getMissedPoints() {
         return missedPoints;
     }
+
+    public boolean allShipsSunk() {
+        for (Ship ship : battleships) {
+            boolean sunk = true;
+            for (Point p : ship.getPoints()) {
+                if (!p.isHit()) {
+                    sunk = false;
+                    break;
+                }
+            }
+            if (!sunk) return false;
+        }
+        return true;
+    }
 }
 

@@ -57,16 +57,28 @@ public class GameController {
         }
     }
 
-    // endpoint per attaccare una cella sul campo nemico
     // dopo l'attacco del giocatore, il nemico attacca automaticamente
     @PutMapping("/attacca/{index}")
     public ResponseEntity<?> attacca(@PathVariable int index) {
+        // controlla se il giocatore ha piazzato tutte le navi
+        int totalShips = 1 + 3 + 3 + 2; // DESTROYER + CRUISER + SUBMARINE + LANCE
+        int placedShips = battleService.getPlayerField().getBattleships().size();
+        if (placedShips < totalShips) {
+            return ResponseEntity.badRequest().body(java.util.Map.of(
+                "error", "Devi piazzare tutte le navi prima di attaccare!"
+            ));
+        }
+
         boolean hit = battleService.attackEnemy(index);
         int enemyIndex = battleService.enemyAttack();
-        // restituisce se il colpo del giocatore è stato un "hit" e la cella attaccata dal nemico
+        boolean playerWin = battleService.isPlayerWinner();
+        boolean enemyWin = battleService.isEnemyWinner();
+        // restituisce se il colpo del giocatore è stato un "hit", la cella attaccata dal nemico e lo stato di vittoria
         return ResponseEntity.ok().body(java.util.Map.of(
             "hit", hit,
-            "enemyIndex", enemyIndex
+            "enemyIndex", enemyIndex,
+            "playerWin", playerWin,
+            "enemyWin", enemyWin
         ));
     }
 }

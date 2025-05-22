@@ -1,79 +1,72 @@
 $(document).ready(function() {
-    /*
-        tipi di navi con numero e dimensione:
-        DESTROYER(4, 1), // 1 nave da 4 caselle
-        CRUISER(3, 3),   // 3 navi da 3 caselle
-        SUBMARINE(2, 3), // 3 navi da 2 caselle
-        LANCE(2, 3);     // 3 navi da 2 caselle (?)
-    */
-
-    // crea una griglia vuota con 100 celle
+    // crea una griglia vuota di 100 celle
     function createEmptyGrid(container) {
         for (let i = 0; i < 100; i++) {
             $(container).append('<div class="cell" data-index="' + i + '"></div>');
         }
     }
 
-    // crea le griglie del giocatore e del computer
     createEmptyGrid('#player-grid');
     createEmptyGrid('#computer-grid');
 
-    // click sulle celle della griglia del giocatore per posizionare la nave
+    // calcola il numero totale di celle occupate da tutte le navi
+    const totalShipCells = 4 * 1 + 3 * 3 + 2 * 3 + 1 * 2;
+
+    // controlla se tutte le navi sono state piazzate
+    function allShipsPlaced() {
+        return $('#player-grid .cell.ship').length === totalShipCells;
+    }
+
+    // piazzamento nave
     $('#player-grid').on('click', '.cell', function () {
         const index = $(this).data('index');
         const type = $('#ship-type').val();
         const orientation = $('#ship-orientation').val();
-        console.log(`[SHIP] Clicked cell index: ${index}, type: ${type}, orientation: ${orientation}`);
-        // invia la richiesta per piazzare la nave
-        $.ajax({
-            url: '/api/place-ship/' + index + "/" + type + "/" + orientation,
-            method: 'POST',
-            success: function(response) {
-                console.log('[SHIP] risposta:', response);
-                // aggiorna la griglia del giocatore con le navi piazzate
-                if (response && response.battleships) {
-                    $('#player-grid .cell').removeClass('ship');
-                    response.battleships.forEach(function(ship, shipIdx) {
-                        console.log(`[SHIP] nave #${shipIdx} tipo: ${ship.type}, punti:`, ship.points);
-                        if (ship.points) {
-                            ship.points.forEach(function(point) {
-                                const idx = point.x * 10 + point.y;
-                                console.log(`[SHIP] cambio colore alla nave nella cella: ${idx} (x=${point.x}, y=${point.y})`);
-                                $('#player-grid .cell').eq(idx).addClass('ship');
-                            });
-                        }
-                    });
-                } else {
-                    console.log('[SHIP] nessuna nave piazzata o risposta non valida');
+
+        $.post(`/api/place-ship/${index}/${type}/${orientation}`, function(response) {
+            // aggiorna la griglia: rimuove tutte le navi e colora quelle piazzate
+            $('#player-grid .cell').removeClass('ship');
+            if (response && response.battleships) {
+                for (var i = 0; i < response.battleships.length; i++) {
+                    var ship = response.battleships[i];
+                    for (var j = 0; j < ship.points.length; j++) {
+                        var point = ship.points[j];
+                        var idx = point.x * 10 + point.y;
+                        $('#player-grid .cell').eq(idx).addClass('ship');
+                    }
                 }
-            },
-            error: function(xhr) {
-                console.log('[SHIP] errore piazzando la nave:', xhr);
-                alert('errore nel piazzamento della nave!');
             }
+        }).fail(function() {
+            alert('Errore nel piazzamento della nave!');
         });
     });
 
-    // click sulle celle della griglia del computer per attaccare
+    // attacco al campo nemico
     $('#computer-grid').on('click', '.cell', function () {
+        if (!allShipsPlaced()) {
+            alert('Devi piazzare tutte le navi prima di attaccare!');
+            return;
+        }
         const index = $(this).data('index');
-        // invia la richiesta di attacco al backend
         $.ajax({
-            url: '/api/attacca/' + index,
+            url: `/api/attacca/${index}`,
             method: 'PUT',
             success: function (response) {
-                // colora la cella attaccata in base al risultato
-                if (response.hit) {
-                    $('#computer-grid .cell').eq(index).addClass('hit');
-                } else {
-                    $('#computer-grid .cell').eq(index).addClass('miss');
+                // colora la cella attaccata
+                $('#computer-grid .cell').eq(index).addClass(response.hit ? 'hit' : 'miss');
+                // colora la cella attaccata dal nemico
+                $('#player-grid .cell').eq(response.enemyIndex).addClass('enemy-attack');
+                // controlla la vittoria
+                if (response.playerWin) {
+                    alert("Hai vinto! Tutte le navi nemiche sono state affondate!");
+                    $('#computer-grid .cell').off('click');
+                } else if (response.enemyWin) {
+                    alert("Hai perso! Tutte le tue navi sono state affondate!");
+                    $('#computer-grid .cell').off('click');
                 }
-                // attacco nemico automatico: colora la cella attaccata dal nemico sulla griglia del giocatore
-                const enemyIdx = response.enemyIndex;
-                $('#player-grid .cell').eq(enemyIdx).addClass('enemy-attack');
             },
-            error: function (xhr) {
-                alert('errore nell attacco!');
+            error: function () {
+                alert('Errore nell\'attacco!');
             }
         });
     });
