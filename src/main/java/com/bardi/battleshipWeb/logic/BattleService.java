@@ -77,4 +77,47 @@ public class BattleService {
             }
         }
     }
+
+    public int enemyAttack() {
+        Random random = new Random();
+        int x, y, index;
+        boolean alreadyTried;
+        do {
+            x = random.nextInt(10);
+            y = random.nextInt(10);
+            index = x * 10 + y;
+            alreadyTried = false;
+            // controlla se già colpito o mancato
+            for (Ship ship : playerField.getBattleships()) {
+                if (ship.occupies(x, y)) {
+                    for (Point p : ship.getPoints()) {
+                        if (p.getX() == x && p.getY() == y && p.isHit()) {
+                            alreadyTried = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            for (Point miss : playerField.getMissedPoints()) {
+                if (miss.getX() == x && miss.getY() == y) {
+                    alreadyTried = true;
+                    break;
+                }
+            }
+        } while (alreadyTried);
+
+        // segui l'attacco
+        boolean hit = false;
+        for (Ship ship : playerField.getBattleships()) {
+            if (ship.occupies(x, y)) {
+                playerField.hit(x, y, ship);
+                hit = true;
+                break;
+            }
+        }
+        if (!hit) {
+            playerField.getMissedPoints().add(new Point(x, y, false));
+        }
+        return index; // restituisce la cella attaccata dal nemico
+    }
 }

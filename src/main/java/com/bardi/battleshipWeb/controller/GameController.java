@@ -27,33 +27,46 @@ public class GameController {
         this.battleService = battleService;
     }
 
+    // riceve l'indice della cella di partenza, il tipo di nave e l'orientamento
     @PostMapping("/place-ship/{index}/{typeString}/{orientation}")
     public ResponseEntity<Field> placeShip(@PathVariable int index,
             @PathVariable String typeString,
             @PathVariable String orientation) {
         int x = index / 10;
-        int y = index % 10;
+        int y = index % 10; 
 
         try {
+            // converte i parametri ricevuti in enum
             Type type = Type.valueOf(typeString.toUpperCase());
             Orientation shipOrientation = Orientation.valueOf(orientation.toUpperCase());
             Point start = new Point(x, y, false);
             Ship ship = new Ship(start, type, shipOrientation);
 
+        
             boolean success = battleService.placePlayerShip(ship);
             if (success) {
+                // se il piazzamento va a buon fine, restituisce il campo aggiornato
                 return ResponseEntity.ok(battleService.getPlayerField());
             } else {
+                // se il piazzamento fallisce, restituisce comunque il campo (con errore)
                 return ResponseEntity.badRequest().body(battleService.getPlayerField());
             }
         } catch (IllegalArgumentException e) {
+            // se i parametri non sono validi, restituisce errore
             return ResponseEntity.badRequest().build();
         }
     }
 
+    // endpoint per attaccare una cella sul campo nemico
+    // dopo l'attacco del giocatore, il nemico attacca automaticamente
     @PutMapping("/attacca/{index}")
     public ResponseEntity<?> attacca(@PathVariable int index) {
         boolean hit = battleService.attackEnemy(index);
-        return ResponseEntity.ok().body(java.util.Map.of("hit", hit));
+        int enemyIndex = battleService.enemyAttack();
+        // restituisce se il colpo del giocatore è stato un "hit" e la cella attaccata dal nemico
+        return ResponseEntity.ok().body(java.util.Map.of(
+            "hit", hit,
+            "enemyIndex", enemyIndex
+        ));
     }
 }
