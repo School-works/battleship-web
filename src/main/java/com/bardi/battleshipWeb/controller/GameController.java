@@ -21,7 +21,7 @@ import com.bardi.battleshipWeb.logic.Type;
 public class GameController {
 
     private final BattleService battleService;
-    private final Random random = new Random();
+
 
     public GameController(BattleService battleService) {
         this.battleService = battleService;

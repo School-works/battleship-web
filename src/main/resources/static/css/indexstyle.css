@@ -1,8 +1,11 @@
 body {
   background-color: #1e1e1e;
-  color: #fff; /* Make all text white */
+  color: #fff; 
 }
-
+.selection {
+  background-color: white;
+  color: black;
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(10, 30px);
@@ -15,14 +18,14 @@ body {
 .cell {
   width: 30px;
   height: 30px;
-  background-color: transparent; /* transparent by default */
+  background-color: transparent; 
   border: 1px solid #007bff;
   cursor: pointer;
   user-select: none;
 }
 
 .cell.ship {
-  background-color: #007bff; /* nave blu */
+  background-color: #007bff;
 }
 
 .cell.hit {
