@@ -27,7 +27,8 @@ $(document).ready(function() {
                     }
                 }
             }).fail(function(xhr) {
-                alert('Errore nel piazzamento della nave!\n' + xhr.responseText);
+                let msg = 'Errore nel piazzamento della nave!';
+                alert(msg);
             });
         });
 
