@@ -128,4 +128,15 @@ public class BattleService {
     public boolean isEnemyWinner() {
         return playerField.allShipsSunk();
     }
+    public void reset() {
+    playerField.getBattleships().clear();
+    playerField.getMissedPoints().clear();
+    playerField.resetCounts();
+
+    enemyField.getBattleships().clear();
+    enemyField.getMissedPoints().clear();
+    enemyField.resetCounts(); 
+
+    generateEnemyField();
+}
 }

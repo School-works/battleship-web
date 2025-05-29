@@ -163,5 +163,12 @@ public class Field {
         }
         return true;
     }
+
+    public void resetCounts() {
+        destroyerCount = 0;
+        cruiserCount = 0;
+        submarineCount = 0;
+        lanceCount = 0;
+    }
 }
 

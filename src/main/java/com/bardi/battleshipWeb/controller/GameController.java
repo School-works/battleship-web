@@ -1,7 +1,5 @@
 package com.bardi.battleshipWeb.controller;
 
-import java.util.Random;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,4 +79,9 @@ public class GameController {
             "enemyWin", enemyWin
         ));
     }
+    @PostMapping("/reset")
+public ResponseEntity<?> reset() {
+    battleService.reset();
+    return ResponseEntity.ok().build();
+}
 }
