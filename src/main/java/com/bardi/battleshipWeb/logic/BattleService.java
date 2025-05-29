@@ -78,16 +78,25 @@ public class BattleService {
         }
     }
 
-    public int enemyAttack() {
+    public static class AttackResult {
+        public final int x;
+        public final int y;
+        public final boolean hit;
+        public AttackResult(int x, int y, boolean hit) {
+            this.x = x;
+            this.y = y;
+            this.hit = hit;
+        }
+    }
+
+    public AttackResult enemyAttackWithResult() {
         Random random = new Random();
-        int x, y, index;
+        int x, y;
         boolean alreadyTried;
         do {
             x = random.nextInt(10);
             y = random.nextInt(10);
-            index = x * 10 + y;
             alreadyTried = false;
-            // controlla se già colpito o mancato
             for (Ship ship : playerField.getBattleships()) {
                 if (ship.occupies(x, y)) {
                     for (Point p : ship.getPoints()) {
@@ -106,7 +115,6 @@ public class BattleService {
             }
         } while (alreadyTried);
 
-        // segui l'attacco
         boolean hit = false;
         for (Ship ship : playerField.getBattleships()) {
             if (ship.occupies(x, y)) {
@@ -118,7 +126,7 @@ public class BattleService {
         if (!hit) {
             playerField.getMissedPoints().add(new Point(x, y, false));
         }
-        return index; // restituisce la cella attaccata dal nemico
+        return new AttackResult(x, y, hit);
     }
 
     public boolean isPlayerWinner() {

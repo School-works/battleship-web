@@ -48,7 +48,9 @@ $(document).ready(function() {
                 method: 'PUT',
                 success: function (response) {
                     $('#computer-grid .cell').eq(index).addClass(response.hit ? 'hit' : 'miss');
-                    $('#player-grid .cell').eq(response.enemyIndex).addClass('enemy-attack');
+                    // Use enemyX and enemyY to find the cell on the player grid
+                    var enemyIdx = response.enemyX * 10 + response.enemyY;
+                    $('#player-grid .cell').eq(enemyIdx).addClass('enemy-attack');
                     if (response.playerWin) {
                         alert("Hai vinto! Tutte le navi nemiche sono state affondate!");
                         $('#computer-grid .cell').off('click');
