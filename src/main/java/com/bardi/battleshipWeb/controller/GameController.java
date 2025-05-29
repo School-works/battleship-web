@@ -73,15 +73,27 @@ public class GameController {
         BattleService.AttackResult enemyResult = battleService.enemyAttackWithResult();
         boolean playerWin = battleService.isPlayerWinner();
         boolean enemyWin = battleService.isEnemyWinner();
+
+        // aggiunge info su navi affondate
+        var battleships = battleService.getPlayerField().getBattleships().stream().map(ship -> {
+            boolean sunk = ship.getPoints().stream().allMatch(p -> p.isHit());
+            return java.util.Map.of(
+                "type", ship.getType().name(),
+                "points", ship.getPoints().stream().map(p -> java.util.Map.of("x", p.getX(), "y", p.getY())).toList(),
+                "sunk", sunk
+            );
+        }).toList();
+
         return ResponseEntity.ok().body(java.util.Map.of(
             "hit", hit,
-            "x", playerX,           // <-- player's attack X
-            "y", playerY,           // <-- player's attack Y
+            "x", playerX,
+            "y", playerY,
+            "enemyHit", enemyResult.hit,
             "enemyX", enemyResult.x,
             "enemyY", enemyResult.y,
-            "enemyHit", enemyResult.hit,
             "playerWin", playerWin,
-            "enemyWin", enemyWin
+            "enemyWin", enemyWin,
+            "battleships", battleships
         ));
     }
     @PostMapping("/reset")

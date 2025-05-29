@@ -39,3 +39,19 @@ body {
 .cell.enemy-attack {
   box-shadow: 0 0 0 2px orange inset;
 }
+
+.cell.ship-DESTROYER {
+  background-color: #007bff;
+}
+.cell.ship-CRUISER {
+  background-color: #28a745;
+}
+.cell.ship-SUBMARINE {
+  background-color: #ffc107;
+}
+.cell.ship-LANCE {
+  background-color: #ad35dc;
+}
+.cell.sunk {
+  background-color: red !important;
+}

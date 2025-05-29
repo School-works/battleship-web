@@ -15,14 +15,17 @@ $(document).ready(function() {
             const orientation = $('#ship-orientation').val();
 
             $.post(`/api/place-ship/${index}/${type}/${orientation}`, function(response) {
-                $('#player-grid .cell').removeClass('ship');
+                $('#player-grid .cell').removeClass('ship ship-DESTROYER ship-CRUISER ship-SUBMARINE ship-LANCE');
                 if (response && response.battleships) {
                     for (var i = 0; i < response.battleships.length; i++) {
                         var ship = response.battleships[i];
+                        var shipType = ship.type;
                         for (var j = 0; j < ship.points.length; j++) {
                             var point = ship.points[j];
                             var idx = point.x * 10 + point.y;
-                            $('#player-grid .cell').eq(idx).addClass('ship');
+                            $('#player-grid .cell').eq(idx)
+                              .addClass('ship')
+                              .addClass('ship-' + shipType);
                         }
                     }
                 }
@@ -48,9 +51,20 @@ $(document).ready(function() {
                 method: 'PUT',
                 success: function (response) {
                     $('#computer-grid .cell').eq(index).addClass(response.hit ? 'hit' : 'miss');
-                    // Use enemyX and enemyY to find the cell on the player grid
                     var enemyIdx = response.enemyX * 10 + response.enemyY;
                     $('#player-grid .cell').eq(enemyIdx).addClass('enemy-attack');
+                    // colorazione delle navi affondate rossa
+                    if (response.battleships) {
+                        $('#player-grid .cell').removeClass('sunk');
+                        response.battleships.forEach(function(ship) {
+                            if (ship.sunk) {
+                                ship.points.forEach(function(point) {
+                                    var idx = point.x * 10 + point.y;
+                                    $('#player-grid .cell').eq(idx).addClass('sunk');
+                                });
+                            }
+                        });
+                    }
                     if (response.playerWin) {
                         alert("Hai vinto! Tutte le navi nemiche sono state affondate!");
                         $('#computer-grid .cell').off('click');
